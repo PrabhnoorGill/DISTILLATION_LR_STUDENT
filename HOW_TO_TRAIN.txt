@@ -1,0 +1,36 @@
+# RealESRGAN Feature Distillation Training (Concise)
+
+Train a smaller "student" SR model using feature distillation from a larger pre-trained "teacher" RealESRGAN model on unpaired low-resolution images.
+
+## Prerequisites
+
+1.  **Python 3.7+**
+2.  **PyTorch:** Install via [pytorch.org](https://pytorch.org/).
+3.  **Project Files:** `train_distill.py`, `archs/rrdbnet_arch.py`, `dataset.py`, `utils.py`.
+4.  **Teacher Model:** Pre-trained RealESRGAN `.pth` file (e.g., `RealESRGAN_x4plus.pth`).
+5.  **LR Dataset:** Directory of low-resolution training images.
+
+## Setup
+
+1.  **Install PyTorch:** (See Prerequisites)
+2.  **Download Teacher Model:** Place `.pth` file where accessible.
+3.  **Prepare LR Dataset:** Put LR images in a folder (e.g., `./datasets/LR_train/`).
+4.  **Identify Layer Names (CRITICAL):**
+    *   You **must** find exact layer names in both teacher and student models for feature matching.
+    *   **How:** Temporarily add `print(model)` or `print(list(model.named_modules()))` in `train_distill.py` for both models and run with basic args to see layer structure. Choose corresponding layers.
+    *   Provide these names via `--teacher_layers` and `--student_layers` (must be same number of names).
+
+## Running the Script
+
+```bash
+python train_distill.py \
+    --teacher_pth_path /path/to/teacher/RealESRGAN_x4plus.pth \
+    --lr_data_dir /path/to/your/LR_train_dataset \
+    --teacher_layers body.10.rdb2.conv2 body.22.rdb3.conv3 \
+    --student_layers body.4.rdb2.conv2 body.9.rdb3.conv3 \
+    # --- Add other args as needed (see below or --help) ---
+    --student_num_feat 32 \
+    --student_num_block 10 \
+    --batch_size 8 \
+    --epochs 100 \
+    --output_dir ./trained_student
