@@ -1,0 +1,19 @@
+Teacher Path (--teacher_pth_path): Update this argument to the correct relative or absolute path to your RealESRGAN-X4.pth file (e.g., ../Real-ESRGAN/weights/RealESRGAN-X4.pth if running from RealESRGAN_Distillation folder).
+
+LR Data Path (--lr_data_dir): Update this to the path containing your real-world LR images for training.
+
+Teacher/Student Config (--teacher_num_feat, --teacher_num_block, --student_num_feat, --student_num_block): Make sure the teacher parameters match your loaded .pth file. Adjust the student parameters to make it smaller/faster if desired.
+
+Distillation Layers (--teacher_layers, --student_layers): This is THE MOST CRITICAL PART.
+
+You need to inspect the actual layer names in both your instantiated teacher and student models. You can do this by adding temporary print statements like print(teacher_model) or iterating through teacher_model.named_modules() before the training loop starts.
+
+Provide the exact names as arguments. For example:
+
+--teacher_layers body.5.rdb1.conv1 body.10.rdb1.conv1 body.15.rdb1.conv1 \
+--student_layers body.2.rdb1.conv1 body.4.rdb1.conv1 body.6.rdb1.conv1
+Use code with caution.
+Bash
+The number of layers in --teacher_layers and --student_layers MUST match, and they should represent semantically corresponding points in the networks. Feature shapes MUST also match for the L1/MSE loss to work directly.
+
+Hyperparameters: Adjust --epochs, --batch_size, --learning_rate, --lambda_feature etc., based on your dataset size, hardware, and experimental results.
